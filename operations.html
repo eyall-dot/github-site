@@ -5,6 +5,155 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>System Operations – Nostromo TES</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    main { max-width: 1200px; padding: 2rem; }
+
+    .ops-page { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* ── Grid meter ─────────────────────────────── */
+    .grid-section { display: flex; flex-direction: column; align-items: center; }
+
+    .grid-meter-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      display: flex; align-items: center; gap: 1.5rem;
+      position: relative; z-index: 1;
+    }
+
+    .meter-info { display: flex; flex-direction: column; gap: 0.2rem; }
+    .meter-title { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+    .meter-value { font-size: 1.8rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .meter-sub { font-size: 0.65rem; color: var(--text-muted); }
+
+    .wire-svg { width: 100%; max-width: 1200px; height: 44px; display: block; overflow: visible; }
+
+    /* ── Three-column layout ────────────────────── */
+    .systems-row {
+      display: grid;
+      grid-template-columns: 1fr 108px 1fr;
+      gap: 0;
+      align-items: stretch;
+    }
+
+    /* ── Panels ─────────────────────────────────── */
+    .sys-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+    .sys-panel-header { padding: 0.875rem 1.25rem; border-bottom: 1px solid var(--border); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
+    .sys-panel-body { padding: 1.1rem; display: flex; flex-direction: column; gap: 1.1rem; flex: 1; }
+
+    /* ── Section labels ─────────────────────────── */
+    .comp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem; }
+    .comp-title { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+
+    /* ── Status dot ─────────────────────────────── */
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #374151; flex-shrink: 0; }
+    .dot.on { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.7); animation: dot-pulse 2s ease-in-out infinite; }
+    .dot.off { background: #374151; }
+    @keyframes dot-pulse { 0%,100% { box-shadow: 0 0 5px rgba(34,197,94,0.6); } 50% { box-shadow: 0 0 12px rgba(34,197,94,1); } }
+
+    /* ── Pipes ───────────────────────────────────── */
+    .pipes { display: flex; flex-direction: column; gap: 0.35rem; }
+    .pipe { height: 21px; border-radius: 11px; display: flex; align-items: center; position: relative; overflow: hidden; }
+    .pipe-tag { position: relative; z-index: 1; font-size: 0.57rem; letter-spacing: 0.05em; padding: 0 10px; font-weight: 600; text-transform: uppercase; }
+    .pipe-flow { position: absolute; inset: 0; background-size: 36px 100%; animation: pipe-scroll 1.6s linear infinite; }
+    .pipe.cold { background: #040f1f; border: 1px solid #1a3a6a; }
+    .pipe.cold .pipe-tag { color: #7dd3fc; }
+    .pipe.cold .pipe-flow { background-image: repeating-linear-gradient(90deg, transparent 0, transparent 10px, rgba(59,130,246,0.22) 10px, rgba(59,130,246,0.22) 18px); }
+    .pipe.warm { background: #1a0800; border: 1px solid #6b2a0a; }
+    .pipe.warm .pipe-tag { color: #fdba74; }
+    .pipe.warm .pipe-flow { background-image: repeating-linear-gradient(90deg, transparent 0, transparent 10px, rgba(249,115,22,0.22) 10px, rgba(249,115,22,0.22) 18px); animation-direction: reverse; }
+    @keyframes pipe-scroll { from { background-position: 0 0; } to { background-position: 36px 0; } }
+
+    /* ── DC Chiller plant ───────────────────────── */
+    .chiller-plant { display: flex; gap: 0.35rem; }
+    .dc-chiller { flex: 1; background: #071428; border: 1px solid #21262d; border-radius: 6px; padding: 0.45rem 0.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+    .dc-chiller.on { border-color: #1d4ed8; box-shadow: 0 0 8px rgba(29,78,216,0.2); }
+    .dc-chiller.off { opacity: 0.35; }
+    .dc-chiller-id { font-size: 0.52rem; color: var(--text-muted); }
+    .fan-g { transform-box: fill-box; transform-origin: center; }
+    .dc-chiller.on .fan-g { animation: spin 1.1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Server racks ───────────────────────────── */
+    .racks { display: flex; gap: 0.35rem; }
+    .rack { flex: 1; background: #0a0f16; border: 1px solid #21262d; border-radius: 4px; padding: 0.35rem 0.25rem; display: flex; flex-direction: column; gap: 2px; }
+    .rack-lbl { font-size: 0.48rem; color: var(--text-muted); text-align: center; margin-bottom: 2px; }
+    .rack-u { height: 6px; background: #1a2030; border-radius: 1px; display: flex; align-items: center; padding: 0 2px; gap: 2px; }
+    .led { width: 3px; height: 3px; border-radius: 50%; }
+    .led.g { background: #22c55e; box-shadow: 0 0 3px rgba(34,197,94,0.6); animation: blink 5s ease-in-out infinite; }
+    .led.b { background: #3b82f6; animation: blink 7s ease-in-out infinite; animation-delay: 2s; }
+    .led.x { background: #374151; }
+    @keyframes blink { 0%,93%,100% { opacity: 1; } 96% { opacity: 0.1; } }
+
+    /* ── CRAH / DLC toggle ──────────────────────── */
+    .mode-toggle { display: flex; background: #04080f; border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 3px; }
+    .mode-btn { flex: 1; padding: 0.4rem 0.5rem; border: none; border-radius: 5px; background: transparent; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: pointer; letter-spacing: 0.04em; transition: all 0.18s; font-family: inherit; }
+    .mode-btn.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+    .mode-view { display: none; }
+    .mode-view.show { display: flex; flex-direction: column; gap: 0.55rem; }
+
+    /* CRAH */
+    .aisle-zone { display: flex; border-radius: 6px; overflow: hidden; height: 52px; border: 1px solid var(--border); }
+    .aisle { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+    .aisle.cold-a { background: rgba(29,78,216,0.1); border-right: 1px solid #1e3a5f; }
+    .aisle.rack-col { flex: 0.6; background: #0a0f16; border-right: 1px solid var(--border); }
+    .aisle.hot-a { background: rgba(194,65,12,0.1); }
+    .aisle-lbl { font-size: 0.52rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .aisle-temp { font-size: 0.58rem; font-variant-numeric: tabular-nums; }
+    .crah-row { display: flex; gap: 0.35rem; }
+    .crah-unit { flex: 1; background: #071428; border: 1px solid #1a3a6a; border-radius: 5px; padding: 0.4rem 0.3rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .crah-lbl { font-size: 0.52rem; color: #60a5fa; }
+
+    /* DLC */
+    .dlc-racks { display: flex; gap: 0.35rem; }
+    .dlc-rack { flex: 1; background: #0a0f16; border: 1px solid #21262d; border-radius: 4px; padding: 0.35rem 0.25rem; display: flex; flex-direction: column; gap: 3px; }
+    .cp-slot { height: 8px; border-radius: 2px; background: #0c1f3a; border: 1px solid #1e3a5f; position: relative; overflow: hidden; }
+    .cp-slot::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(90deg, transparent 0, transparent 6px, rgba(59,130,246,0.2) 6px, rgba(59,130,246,0.2) 12px); background-size: 24px 100%; animation: pipe-scroll 2s linear infinite; }
+    .dlc-bottom { display: flex; gap: 0.5rem; align-items: center; }
+    .cdu-box { flex: 1; background: #040f1f; border: 1px solid #1d4ed8; border-radius: 7px; padding: 0.55rem; text-align: center; box-shadow: 0 0 10px rgba(29,78,216,0.15); }
+    .cdu-lbl { font-size: 0.62rem; font-weight: 700; color: #60a5fa; }
+    .cdu-sub { font-size: 0.52rem; color: var(--text-muted); margin-top: 1px; }
+    .dlc-hx-box { flex: 1; background: #1a0800; border: 1px solid #c2410c; border-radius: 7px; padding: 0.55rem; text-align: center; }
+    .dlc-hx-lbl { font-size: 0.62rem; font-weight: 700; color: #fb923c; }
+    .dlc-hx-sub { font-size: 0.52rem; color: var(--text-muted); margin-top: 1px; }
+
+    /* ── Icebricks ───────────────────────────────── */
+    .icebricks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
+    .icebrick { background: #070e1a; border: 1px solid #1a3a6a; border-radius: 6px; padding: 0.45rem 0.35rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .ib-id { font-size: 0.52rem; color: var(--text-muted); }
+    .ib-tank { width: 100%; height: 54px; background: #04101e; border-radius: 3px; border: 1px solid #1a3a6a; position: relative; overflow: hidden; }
+    .ib-fill { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, #1d4ed8 0%, #3b82f6 60%, #93c5fd 100%); transition: height 2s ease; }
+    .ib-fill::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0) 0, rgba(255,255,255,0) 6px, rgba(255,255,255,0.04) 6px, rgba(255,255,255,0.04) 8px); }
+    .ib-glow { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(59,130,246,0.12) 0%, transparent 70%); pointer-events: none; }
+    .ib-soc { font-size: 0.58rem; color: #60a5fa; font-variant-numeric: tabular-nums; }
+
+    /* ── Glycol chiller ─────────────────────────── */
+    .glycol-chiller { background: #071428; border: 1px solid #21262d; border-radius: 8px; padding: 0.7rem 0.9rem; display: flex; align-items: center; justify-content: space-between; }
+    .glycol-chiller.on { border-color: #22c55e; box-shadow: 0 0 12px rgba(34,197,94,0.1); }
+    .gc-info { display: flex; flex-direction: column; gap: 0.18rem; }
+    .gc-name { font-size: 0.8rem; font-weight: 600; }
+    .gc-stats { font-size: 0.62rem; color: var(--text-muted); }
+
+    /* ── Pumps ───────────────────────────────────── */
+    .pumps { display: flex; gap: 0.5rem; }
+    .pump { flex: 1; background: #071428; border: 1px solid #21262d; border-radius: 8px; padding: 0.55rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .pump-w { transform-box: fill-box; transform-origin: center; animation: spin 2s linear infinite; }
+    .pump-lbl { font-size: 0.58rem; color: var(--text-muted); }
+
+    /* ── Center: Heat Exchanger ─────────────────── */
+    .center-col { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem 0; }
+    .hx-box { background: var(--surface); border: 1px solid #f97316; border-radius: 10px; padding: 1rem 0.6rem; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; box-shadow: 0 0 20px rgba(249,115,22,0.1); }
+    .hx-title { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: #fb923c; font-weight: 700; text-align: center; line-height: 1.4; }
+    .hx-pipe-stack { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+    .hx-p { height: 6px; border-radius: 3px; position: relative; overflow: hidden; }
+    .hx-p.cold { background: #0c1f3a; border: 1px solid #1d4ed8; }
+    .hx-p.warm { background: #1a0800; border: 1px solid #c2410c; }
+    .hx-p::after { content: ''; position: absolute; inset: 0; animation: pipe-scroll 1.4s linear infinite; }
+    .hx-p.cold::after { background-image: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(59,130,246,0.4) 5px, rgba(59,130,246,0.4) 10px); background-size: 20px 100%; }
+    .hx-p.warm::after { background-image: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(249,115,22,0.4) 5px, rgba(249,115,22,0.4) 10px); background-size: 20px 100%; animation-direction: reverse; }
+    .hx-note { font-size: 0.55rem; color: var(--text-muted); text-align: center; line-height: 1.5; }
+  </style>
 </head>
 <body>
   <header>
@@ -22,6 +171,442 @@
       <div class="label">Page 2</div>
       <h1>System Operations</h1>
     </div>
+
+    <div class="ops-page">
+
+      <!-- ── Grid Meter ───────────────────────────── -->
+      <div class="grid-section">
+        <div class="grid-meter-card">
+          <svg width="68" height="68" viewBox="0 0 68 68">
+            <circle cx="34" cy="34" r="26" fill="none" stroke="#21262d" stroke-width="5"/>
+            <circle cx="34" cy="34" r="26" fill="none" stroke="#58a6ff" stroke-width="5"
+              stroke-dasharray="120 163" stroke-linecap="round"
+              transform="rotate(-90 34 34)">
+              <animate attributeName="stroke-dasharray" values="0 163;120 163" dur="1.8s" fill="freeze"/>
+            </circle>
+            <text x="34" y="40" text-anchor="middle" fill="#58a6ff" font-size="17">⚡</text>
+          </svg>
+          <div class="meter-info">
+            <div class="meter-title">Main Grid Connection</div>
+            <div class="meter-value" id="meterVal">1.24 MW</div>
+            <div class="meter-sub">Active import · 480 V / 3φ</div>
+          </div>
+        </div>
+
+        <!-- Wires splitting left and right -->
+        <svg class="wire-svg" viewBox="0 0 1200 44" preserveAspectRatio="none">
+          <line x1="600" y1="0" x2="600" y2="16" stroke="#58a6ff" stroke-width="2" opacity="0.5"/>
+          <line x1="600" y1="16" x2="120"  y2="44" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.35"/>
+          <line x1="600" y1="16" x2="1080" y2="44" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.35"/>
+        </svg>
+      </div>
+
+      <!-- ── Systems ──────────────────────────────── -->
+      <div class="systems-row">
+
+        <!-- ── LEFT: Data Center ─────────────────── -->
+        <div class="sys-panel">
+          <div class="sys-panel-header">
+            Data Center
+            <span class="dot on"></span>
+          </div>
+          <div class="sys-panel-body">
+
+            <!-- Chiller plant -->
+            <div>
+              <div class="comp-head"><span class="comp-title">Chiller Plant</span></div>
+              <div class="chiller-plant">
+
+                <!-- CH-01 on -->
+                <div class="dc-chiller on">
+                  <svg width="30" height="30" viewBox="0 0 30 30">
+                    <circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/>
+                    <g class="fan-g">
+                      <path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity="0.85"/>
+                    </g>
+                    <circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/>
+                  </svg>
+                  <span class="dc-chiller-id">CH-01</span>
+                </div>
+
+                <!-- CH-02 on -->
+                <div class="dc-chiller on">
+                  <svg width="30" height="30" viewBox="0 0 30 30">
+                    <circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/>
+                    <g class="fan-g">
+                      <path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity="0.85"/>
+                    </g>
+                    <circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/>
+                  </svg>
+                  <span class="dc-chiller-id">CH-02</span>
+                </div>
+
+                <!-- CH-03 on -->
+                <div class="dc-chiller on">
+                  <svg width="30" height="30" viewBox="0 0 30 30">
+                    <circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/>
+                    <g class="fan-g">
+                      <path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity="0.85"/>
+                      <path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity="0.85"/>
+                    </g>
+                    <circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/>
+                  </svg>
+                  <span class="dc-chiller-id">CH-03</span>
+                </div>
+
+                <!-- CH-04 off -->
+                <div class="dc-chiller off">
+                  <svg width="30" height="30" viewBox="0 0 30 30">
+                    <circle cx="15" cy="15" r="13" fill="#071428" stroke="#374151" stroke-width="1.5"/>
+                    <g>
+                      <path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#4b5563" opacity="0.5"/>
+                      <path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#4b5563" opacity="0.5"/>
+                      <path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#4b5563" opacity="0.5"/>
+                      <path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#4b5563" opacity="0.5"/>
+                    </g>
+                    <circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#6b7280" stroke-width="1"/>
+                  </svg>
+                  <span class="dc-chiller-id">CH-04</span>
+                </div>
+
+                <!-- CH-05 off -->
+                <div class="dc-chiller off">
+                  <svg width="30" height="30" viewBox="0 0 30 30">
+                    <circle cx="15" cy="15" r="13" fill="#071428" stroke="#374151" stroke-width="1.5"/>
+                    <g>
+                      <path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#4b5563" opacity="0.5"/>
+                      <path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#4b5563" opacity="0.5"/>
+                      <path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#4b5563" opacity="0.5"/>
+                      <path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#4b5563" opacity="0.5"/>
+                    </g>
+                    <circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#6b7280" stroke-width="1"/>
+                  </svg>
+                  <span class="dc-chiller-id">CH-05</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- DC Pipes -->
+            <div class="pipes">
+              <div class="pipe cold"><div class="pipe-flow"></div><span class="pipe-tag">Chilled Water Supply · 6 °C</span></div>
+              <div class="pipe warm"><div class="pipe-flow"></div><span class="pipe-tag">Chilled Water Return · 12 °C</span></div>
+            </div>
+
+            <!-- Server Racks -->
+            <div>
+              <div class="comp-head"><span class="comp-title">Server Racks</span></div>
+              <div class="racks">
+                <div class="rack">
+                  <div class="rack-lbl">RACK-A</div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led b"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led x"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led b"></span><span class="led g"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led x"></span></div>
+                  <div class="rack-u"><span class="led x"></span><span class="led g"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led b"></span><span class="led g"></span></div>
+                </div>
+                <div class="rack">
+                  <div class="rack-lbl">RACK-B</div>
+                  <div class="rack-u"><span class="led g"></span><span class="led x"></span><span class="led b"></span></div>
+                  <div class="rack-u"><span class="led b"></span><span class="led g"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led x"></span><span class="led g"></span><span class="led x"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led b"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led x"></span><span class="led g"></span></div>
+                </div>
+                <div class="rack">
+                  <div class="rack-lbl">RACK-C</div>
+                  <div class="rack-u"><span class="led b"></span><span class="led g"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led x"></span></div>
+                  <div class="rack-u"><span class="led x"></span><span class="led b"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led x"></span><span class="led b"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led g"></span></div>
+                </div>
+                <div class="rack">
+                  <div class="rack-lbl">RACK-D</div>
+                  <div class="rack-u"><span class="led g"></span><span class="led b"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led x"></span><span class="led g"></span><span class="led x"></span></div>
+                  <div class="rack-u"><span class="led b"></span><span class="led x"></span><span class="led g"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led x"></span></div>
+                  <div class="rack-u"><span class="led g"></span><span class="led b"></span><span class="led g"></span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- IT Cooling Toggle -->
+            <div>
+              <div class="comp-head"><span class="comp-title">IT Cooling Type</span></div>
+              <div class="mode-toggle">
+                <button class="mode-btn active" onclick="setMode('crah',event)">CRAH</button>
+                <button class="mode-btn" onclick="setMode('dlc',event)">DLC</button>
+              </div>
+
+              <!-- CRAH -->
+              <div class="mode-view show" id="view-crah" style="margin-top:0.55rem">
+                <div class="aisle-zone">
+                  <div class="aisle cold-a">
+                    <span class="aisle-lbl" style="color:#7dd3fc">Cold Aisle</span>
+                    <span class="aisle-temp" style="color:#7dd3fc">18 °C</span>
+                  </div>
+                  <div class="aisle rack-col">
+                    <svg width="22" height="34" viewBox="0 0 22 34">
+                      <rect x="1" y="0" width="20" height="34" rx="2" fill="#1a2030" stroke="#374151"/>
+                      <rect x="3" y="3"  width="16" height="3" rx="1" fill="#374151"/>
+                      <rect x="3" y="8"  width="16" height="3" rx="1" fill="#374151"/>
+                      <rect x="3" y="13" width="16" height="3" rx="1" fill="#374151"/>
+                      <rect x="3" y="18" width="16" height="3" rx="1" fill="#374151"/>
+                      <rect x="3" y="23" width="16" height="3" rx="1" fill="#374151"/>
+                      <rect x="3" y="28" width="16" height="3" rx="1" fill="#374151"/>
+                    </svg>
+                  </div>
+                  <div class="aisle hot-a">
+                    <span class="aisle-lbl" style="color:#fdba74">Hot Aisle</span>
+                    <span class="aisle-temp" style="color:#fdba74">35 °C</span>
+                  </div>
+                </div>
+                <div class="crah-row">
+                  <div class="crah-unit">
+                    <svg width="22" height="18" viewBox="0 0 22 18">
+                      <rect width="22" height="18" rx="2" fill="#071428" stroke="#1a3a6a"/>
+                      <line x1="4" y1="4"  x2="18" y2="4"  stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="7"  x2="18" y2="7"  stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="10" x2="18" y2="10" stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="13" x2="18" y2="13" stroke="#60a5fa" stroke-width="1"/>
+                      <path d="M11 16 L9 13 L13 13 Z" fill="#60a5fa" opacity="0.7"/>
+                    </svg>
+                    <span class="crah-lbl">CRAH-1</span>
+                  </div>
+                  <div class="crah-unit">
+                    <svg width="22" height="18" viewBox="0 0 22 18">
+                      <rect width="22" height="18" rx="2" fill="#071428" stroke="#1a3a6a"/>
+                      <line x1="4" y1="4"  x2="18" y2="4"  stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="7"  x2="18" y2="7"  stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="10" x2="18" y2="10" stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="13" x2="18" y2="13" stroke="#60a5fa" stroke-width="1"/>
+                      <path d="M11 16 L9 13 L13 13 Z" fill="#60a5fa" opacity="0.7"/>
+                    </svg>
+                    <span class="crah-lbl">CRAH-2</span>
+                  </div>
+                  <div class="crah-unit">
+                    <svg width="22" height="18" viewBox="0 0 22 18">
+                      <rect width="22" height="18" rx="2" fill="#071428" stroke="#1a3a6a"/>
+                      <line x1="4" y1="4"  x2="18" y2="4"  stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="7"  x2="18" y2="7"  stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="10" x2="18" y2="10" stroke="#60a5fa" stroke-width="1"/>
+                      <line x1="4" y1="13" x2="18" y2="13" stroke="#60a5fa" stroke-width="1"/>
+                      <path d="M11 16 L9 13 L13 13 Z" fill="#60a5fa" opacity="0.7"/>
+                    </svg>
+                    <span class="crah-lbl">CRAH-3</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- DLC -->
+              <div class="mode-view" id="view-dlc" style="margin-top:0.55rem">
+                <div class="dlc-racks">
+                  <div class="dlc-rack">
+                    <div class="rack-lbl">RACK-A</div>
+                    <div class="cp-slot"></div><div class="cp-slot"></div><div class="cp-slot"></div>
+                    <div class="cp-slot"></div><div class="cp-slot"></div>
+                  </div>
+                  <div class="dlc-rack">
+                    <div class="rack-lbl">RACK-B</div>
+                    <div class="cp-slot"></div><div class="cp-slot"></div><div class="cp-slot"></div>
+                    <div class="cp-slot"></div><div class="cp-slot"></div>
+                  </div>
+                  <div class="dlc-rack">
+                    <div class="rack-lbl">RACK-C</div>
+                    <div class="cp-slot"></div><div class="cp-slot"></div><div class="cp-slot"></div>
+                    <div class="cp-slot"></div><div class="cp-slot"></div>
+                  </div>
+                </div>
+                <div class="dlc-bottom">
+                  <div class="cdu-box">
+                    <div class="cdu-lbl">CDU</div>
+                    <div class="cdu-sub">Cooling Dist. Unit</div>
+                  </div>
+                  <svg width="18" height="18" viewBox="0 0 18 18" style="flex-shrink:0;opacity:0.4">
+                    <path d="M2 9 H16 M12 5 L16 9 L12 13" stroke="#8b949e" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <div class="dlc-hx-box">
+                    <div class="dlc-hx-lbl">HX</div>
+                    <div class="dlc-hx-sub">Loop isolator</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── CENTER: Heat Exchanger ──────────────── -->
+        <div class="center-col">
+          <div class="hx-box">
+            <div class="hx-title">Heat Exchanger</div>
+            <div class="hx-pipe-stack">
+              <div class="hx-p cold"></div>
+              <div class="hx-p warm"></div>
+              <div class="hx-p cold"></div>
+              <div class="hx-p warm"></div>
+            </div>
+            <svg width="52" height="42" viewBox="0 0 52 42">
+              <path d="M4 10 Q13 10 13 21 Q13 32 22 32 Q31 32 31 21 Q31 10 40 10 Q49 10 49 21"
+                fill="none" stroke="#1d4ed8" stroke-width="2" opacity="0.8" stroke-linecap="round"/>
+              <path d="M4 32 Q13 32 13 21 Q13 10 22 10 Q31 10 31 21 Q31 32 40 32 Q49 32 49 21"
+                fill="none" stroke="#c2410c" stroke-width="2" opacity="0.8" stroke-linecap="round"/>
+            </svg>
+            <div class="hx-note">Glycol ↔ Water</div>
+          </div>
+        </div>
+
+        <!-- ── RIGHT: Icebrick System ─────────────── -->
+        <div class="sys-panel">
+          <div class="sys-panel-header">
+            Icebrick System
+            <span class="dot on"></span>
+          </div>
+          <div class="sys-panel-body">
+
+            <!-- Icebricks -->
+            <div>
+              <div class="comp-head"><span class="comp-title">Thermal Storage Units</span></div>
+              <div class="icebricks">
+                <div class="icebrick">
+                  <span class="ib-id">ICE-01</span>
+                  <div class="ib-tank"><div class="ib-fill" style="height:92%"></div><div class="ib-glow"></div></div>
+                  <span class="ib-soc">92%</span>
+                </div>
+                <div class="icebrick">
+                  <span class="ib-id">ICE-02</span>
+                  <div class="ib-tank"><div class="ib-fill" style="height:87%"></div><div class="ib-glow"></div></div>
+                  <span class="ib-soc">87%</span>
+                </div>
+                <div class="icebrick">
+                  <span class="ib-id">ICE-03</span>
+                  <div class="ib-tank"><div class="ib-fill" style="height:78%"></div><div class="ib-glow"></div></div>
+                  <span class="ib-soc">78%</span>
+                </div>
+                <div class="icebrick">
+                  <span class="ib-id">ICE-04</span>
+                  <div class="ib-tank"><div class="ib-fill" style="height:65%"></div><div class="ib-glow"></div></div>
+                  <span class="ib-soc">65%</span>
+                </div>
+                <div class="icebrick">
+                  <span class="ib-id">ICE-05</span>
+                  <div class="ib-tank"><div class="ib-fill" style="height:71%"></div><div class="ib-glow"></div></div>
+                  <span class="ib-soc">71%</span>
+                </div>
+                <div class="icebrick">
+                  <span class="ib-id">ICE-06</span>
+                  <div class="ib-tank"><div class="ib-fill" style="height:44%"></div><div class="ib-glow"></div></div>
+                  <span class="ib-soc">44%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Glycol Chiller -->
+            <div>
+              <div class="comp-head">
+                <span class="comp-title">Glycol Chiller</span>
+                <span class="dot on"></span>
+              </div>
+              <div class="glycol-chiller on">
+                <div class="gc-info">
+                  <span class="gc-name">GC-01</span>
+                  <span class="gc-stats">Outlet: −3 °C · COP 3.2</span>
+                </div>
+                <svg width="38" height="38" viewBox="0 0 38 38">
+                  <rect width="38" height="38" rx="7" fill="#071428" stroke="#22c55e"/>
+                  <path d="M8 10 Q12 10 12 15 Q12 20 16 20 Q20 20 20 25 Q20 30 24 30 Q28 30 28 25"
+                    fill="none" stroke="#22c55e" stroke-width="1.5"/>
+                  <text x="19" y="14" text-anchor="middle" fill="#60a5fa" font-size="9">❄</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Pumps -->
+            <div>
+              <div class="comp-head"><span class="comp-title">Circulation Pumps</span></div>
+              <div class="pumps">
+                <div class="pump">
+                  <svg width="34" height="34" viewBox="0 0 34 34">
+                    <circle cx="17" cy="17" r="15" fill="#071428" stroke="#1a3a6a" stroke-width="1.5"/>
+                    <g class="pump-w">
+                      <path d="M17 4 Q19 11 17 17 Q15 11 17 4" fill="#3b82f6" opacity="0.9"/>
+                      <path d="M30 17 Q23 19 17 17 Q23 15 30 17" fill="#3b82f6" opacity="0.9"/>
+                      <path d="M17 30 Q15 23 17 17 Q19 23 17 30" fill="#3b82f6" opacity="0.9"/>
+                      <path d="M4 17 Q11 15 17 17 Q11 19 4 17" fill="#3b82f6" opacity="0.9"/>
+                      <path d="M24 10 Q20 14 17 17 Q17 13 24 10" fill="#2563eb" opacity="0.7"/>
+                      <path d="M24 24 Q20 20 17 17 Q21 17 24 24" fill="#2563eb" opacity="0.7"/>
+                      <path d="M10 24 Q14 20 17 17 Q17 21 10 24" fill="#2563eb" opacity="0.7"/>
+                      <path d="M10 10 Q14 14 17 17 Q13 17 10 10" fill="#2563eb" opacity="0.7"/>
+                    </g>
+                    <circle cx="17" cy="17" r="3" fill="#0d1117" stroke="#3b82f6" stroke-width="1"/>
+                  </svg>
+                  <span class="pump-lbl">P-01</span>
+                </div>
+                <div class="pump">
+                  <svg width="34" height="34" viewBox="0 0 34 34">
+                    <circle cx="17" cy="17" r="15" fill="#071428" stroke="#1a3a6a" stroke-width="1.5"/>
+                    <g class="pump-w">
+                      <path d="M17 4 Q19 11 17 17 Q15 11 17 4" fill="#3b82f6" opacity="0.9"/>
+                      <path d="M30 17 Q23 19 17 17 Q23 15 30 17" fill="#3b82f6" opacity="0.9"/>
+                      <path d="M17 30 Q15 23 17 17 Q19 23 17 30" fill="#3b82f6" opacity="0.9"/>
+                      <path d="M4 17 Q11 15 17 17 Q11 19 4 17" fill="#3b82f6" opacity="0.9"/>
+                      <path d="M24 10 Q20 14 17 17 Q17 13 24 10" fill="#2563eb" opacity="0.7"/>
+                      <path d="M24 24 Q20 20 17 17 Q21 17 24 24" fill="#2563eb" opacity="0.7"/>
+                      <path d="M10 24 Q14 20 17 17 Q17 21 10 24" fill="#2563eb" opacity="0.7"/>
+                      <path d="M10 10 Q14 14 17 17 Q13 17 10 10" fill="#2563eb" opacity="0.7"/>
+                    </g>
+                    <circle cx="17" cy="17" r="3" fill="#0d1117" stroke="#3b82f6" stroke-width="1"/>
+                  </svg>
+                  <span class="pump-lbl">P-02</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TES Pipes -->
+            <div class="pipes">
+              <div class="pipe cold"><div class="pipe-flow"></div><span class="pipe-tag">Glycol Supply · −3 °C</span></div>
+              <div class="pipe warm"><div class="pipe-flow"></div><span class="pipe-tag">Glycol Return · +4 °C</span></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
   </main>
+
+  <script>
+    function setMode(mode, e) {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.mode-view').forEach(v => v.classList.remove('show'));
+      e.target.classList.add('active');
+      document.getElementById('view-' + mode).classList.add('show');
+    }
+
+    // Live meter reading
+    (function() {
+      const el = document.getElementById('meterVal');
+      let v = 1.24;
+      setInterval(() => {
+        v += (Math.random() - 0.5) * 0.06;
+        v = Math.max(0.9, Math.min(1.9, v));
+        el.textContent = v.toFixed(2) + ' MW';
+      }, 2200);
+    })();
+  </script>
 </body>
 </html>
