@@ -6,40 +6,35 @@
   <title>System Operations – Nostromo TES</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    main { max-width: 1200px; padding: 2rem; }
+    main { max-width: 1280px; padding: 2rem; }
     .ops-page { display: flex; flex-direction: column; gap: 1.5rem; }
 
-    /* ── Grid meter ────────────────────────── */
+    /* grid meter */
     .grid-section { display: flex; flex-direction: column; align-items: center; }
     .grid-meter-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 2rem; display: flex; align-items: center; gap: 1.5rem; }
-    .meter-info { display: flex; flex-direction: column; gap: 0.2rem; }
     .meter-title { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
     .meter-value { font-size: 1.8rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
     .meter-sub { font-size: 0.65rem; color: var(--text-muted); }
-    .wire-svg { width: 100%; max-width: 1200px; height: 44px; display: block; overflow: visible; }
+    .wire-svg { width: 100%; max-width: 1280px; height: 44px; display: block; overflow: visible; }
 
-    /* ── Layout ────────────────────────────── */
-    .systems-row { display: grid; grid-template-columns: 1fr 108px 1fr; align-items: stretch; }
-
-    /* ── Panel ─────────────────────────────── */
-    .sys-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
-    .sys-panel-header { padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
-    .sys-panel-body { padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 1rem; flex: 1; }
-
-    /* ── Section label ─────────────────────── */
-    .comp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+    /* layout */
+    .systems-row { display: grid; grid-template-columns: 1fr 116px 1fr; align-items: stretch; }
+    .sys-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: visible; display: flex; flex-direction: column; }
+    .sys-panel-header { padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); border-radius: 12px 12px 0 0; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .sys-panel-body { padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.9rem; flex: 1; }
+    .comp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; }
     .comp-title { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
 
-    /* ── Status dot ────────────────────────── */
+    /* dot */
     .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .dot.on { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.7); animation: dot-pulse 2s ease-in-out infinite; }
     .dot.off { background: #374151; }
     @keyframes dot-pulse { 0%,100% { box-shadow: 0 0 5px rgba(34,197,94,0.5); } 50% { box-shadow: 0 0 12px rgba(34,197,94,1); } }
 
-    /* ── Pipes ─────────────────────────────── */
-    .pipes { display: flex; flex-direction: column; gap: 0.3rem; }
+    /* pipes */
+    .pipes { display: flex; flex-direction: column; gap: 4px; position: relative; z-index: 0; }
     .pipe { height: 13px; border-radius: 7px; display: flex; align-items: center; position: relative; overflow: hidden; }
-    .pipe-tag { position: relative; z-index: 1; font-size: 0.55rem; letter-spacing: 0.04em; padding: 0 8px; font-weight: 600; text-transform: uppercase; }
+    .pipe-tag { position: relative; z-index: 1; font-size: 0.52rem; letter-spacing: 0.04em; padding: 0 8px; font-weight: 600; text-transform: uppercase; }
     .pipe-flow { position: absolute; inset: 0; background-size: 30px 100%; animation: pipe-scroll 1.6s linear infinite; }
     .pipe.cold { background: #040f1f; border: 1px solid #1a3a6a; }
     .pipe.cold .pipe-tag { color: #7dd3fc; }
@@ -49,63 +44,110 @@
     .pipe.warm .pipe-flow { background-image: repeating-linear-gradient(90deg, transparent 0, transparent 8px, rgba(249,115,22,0.25) 8px, rgba(249,115,22,0.25) 15px); animation-direction: reverse; }
     @keyframes pipe-scroll { from { background-position: 0 0; } to { background-position: 30px 0; } }
 
-    /* ── DC Chiller plant ──────────────────── */
-    .chiller-plant { display: flex; gap: 0.35rem; }
-    .dc-chiller { flex: 1; background: #071428; border: 1px solid #21262d; border-radius: 6px; padding: 0.45rem 0.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
-    .dc-chiller.on { border-color: #1d4ed8; box-shadow: 0 0 8px rgba(29,78,216,0.2); }
-    .dc-chiller.off { opacity: 0.35; }
-    .dc-chiller-id { font-size: 0.52rem; color: var(--text-muted); }
+    /* pipe canvas — pumps sit on top of pipes */
+    .pipe-canvas { position: relative; padding-top: 26px; }
+    .pump-on-pipe { position: absolute; z-index: 3; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; }
+    /* cold pipe center = 26px padding + 6.5px half-pipe = 32.5px */
+    .pump-cold { top: 32px; left: 28%; }
+    /* warm pipe center = 26 + 13 + 4 + 6.5 = 49.5px */
+    .pump-warm { top: 49px; left: 72%; }
+    .pump-visual { width: 32px; height: 32px; position: relative; display: flex; align-items: center; justify-content: center; }
+    .pump-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 1.5px solid #3b82f6; animation: pump-expand 1.8s ease-out infinite; opacity: 0; }
+    .pump-ring:nth-child(2) { animation-delay: 0.6s; }
+    .pump-ring:nth-child(3) { animation-delay: 1.2s; }
+    @keyframes pump-expand { 0% { transform: scale(0.25); opacity: 0.75; } 100% { transform: scale(1.5); opacity: 0; } }
+    .pump-core { width: 13px; height: 13px; background: #1d4ed8; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.44rem; font-weight: 700; color: white; position: relative; z-index: 1; }
+    .pump-lbl { font-size: 0.46rem; color: var(--text-muted); line-height: 1; }
+
+    /* spin */
+    @keyframes spin { to { transform: rotate(360deg); } }
     .fan-g { transform-box: fill-box; transform-origin: center; }
     .dc-chiller.on .fan-g { animation: spin 1.1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── IT cooling toggle (in header) ────── */
+    /* DC chiller plant */
+    .chiller-plant { display: flex; gap: 0.3rem; }
+    .dc-chiller { flex: 1; background: #071428; border: 1px solid #21262d; border-radius: 6px; padding: 0.4rem 0.15rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .dc-chiller.on { border-color: #1d4ed8; box-shadow: 0 0 8px rgba(29,78,216,0.2); }
+    .dc-chiller.off { opacity: 0.3; }
+    .dc-chiller-id { font-size: 0.5rem; color: var(--text-muted); }
+
+    /* glycol chiller — teal, 2 fans, mirrors DC chiller style */
+    .glycol-chiller { border-radius: 8px; overflow: hidden; border: 1px solid #0f766e; background: #020c0c; }
+    .glycol-chiller.on { border-color: #0d9488; box-shadow: 0 0 18px rgba(13,148,136,0.12); }
+    .gc-intake { background: #2a0e04; height: 9px; display: flex; align-items: stretch; gap: 9px; padding: 0 4px; }
+    .gc-intake-vent { flex: 1; border-left: 1px solid #5a2010; }
+    .gc-body { padding: 0.35rem 0.7rem 0.4rem; display: flex; flex-direction: column; gap: 0.3rem; background: #020c0c; }
+    .gc-header { display: flex; align-items: center; justify-content: space-between; }
+    .gc-name { font-size: 0.72rem; font-weight: 600; color: #2dd4bf; }
+    .gc-status-txt { font-size: 0.52rem; color: #22c55e; }
+    .gc-fans { display: flex; gap: 0.5rem; justify-content: center; }
+    .gc-fan-unit { display: flex; flex-direction: column; align-items: center; gap: 0.12rem; }
+    .gc-fan-lbl { font-size: 0.44rem; color: var(--text-muted); }
+    .teal-fan-g { transform-box: fill-box; transform-origin: center; animation: spin 1.4s linear infinite; }
+    .gc-exhaust { background: #040e1e; height: 7px; }
+
+    /* IT cooling toggle */
     .mode-toggle { display: flex; background: #04080f; border: 1px solid var(--border); border-radius: 6px; padding: 2px; gap: 2px; }
     .mode-btn { padding: 0.25rem 0.6rem; border: none; border-radius: 4px; background: transparent; color: var(--text-muted); font-size: 0.68rem; font-weight: 700; cursor: pointer; letter-spacing: 0.04em; transition: all 0.18s; font-family: inherit; white-space: nowrap; }
     .mode-btn.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 
-    /* ── Cooling mode views ────────────────── */
-    .mode-view { display: none; flex-direction: column; gap: 0.5rem; }
+    /* mode views */
+    .mode-view { display: none; flex-direction: column; gap: 0.45rem; }
     .mode-view.show { display: flex; }
 
-    /* shared badge */
-    .bldg-badge { background: #0d1a0d; border: 1px solid #166534; border-radius: 5px; padding: 0.3rem 0.55rem; font-size: 0.58rem; font-weight: 600; color: #4ade80; letter-spacing: 0.03em; white-space: nowrap; }
-    .loop-note { font-size: 0.52rem; color: var(--text-muted); }
+    /* CRAH units */
+    .crah-fan-g { transform-box: fill-box; transform-origin: center; animation: spin 1.6s linear infinite; }
+    .crah-units-row { display: flex; gap: 0.35rem; }
+    .crah-unit-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
+    .crah-lbl { font-size: 0.46rem; color: #60a5fa; }
+    @keyframes cold-drop { 0%{opacity:0;transform:translateY(-2px)} 40%{opacity:.8} 100%{opacity:0;transform:translateY(12px)} }
+    .cd1{animation:cold-drop 1.4s ease-in infinite}
+    .cd2{animation:cold-drop 1.4s ease-in infinite .32s}
+    .cd3{animation:cold-drop 1.4s ease-in infinite .64s}
 
-    /* ── CRAH view ─────────────────────────── */
-    .crah-view-body { display: flex; flex-direction: column; gap: 0.5rem; }
-    .crah-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-    .crah-units { display: flex; gap: 0.4rem; flex: 1; }
-    .crah-u { flex: 1; background: #071428; border: 1px solid #1a3a6a; border-radius: 5px; padding: 0.4rem 0.25rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-    .crah-u-lbl { font-size: 0.52rem; color: #60a5fa; }
-    .aisle-row { display: flex; gap: 0; border-radius: 5px; overflow: hidden; border: 1px solid var(--border); }
-    .aisle-seg { flex: 1; padding: 0.35rem 0.5rem; font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; }
-    .aisle-seg.cold { background: rgba(29,78,216,0.1); color: #7dd3fc; border-right: 1px solid #1e3a5f; }
-    .aisle-seg.hot  { background: rgba(194,65,12,0.1);  color: #fdba74; }
-    .aisle-conn-note { font-size: 0.55rem; color: var(--text-muted); text-align: center; padding: 0.1rem 0; }
+    /* airflow connection CRAH → racks */
+    .airflow-conn { display: grid; grid-template-columns: 1fr 1fr; height: 20px; }
+    .af-cold { background: linear-gradient(180deg, rgba(59,130,246,0.18) 0%, rgba(59,130,246,0.04) 100%); border: 1px solid rgba(59,130,246,0.22); border-right: none; display: flex; align-items: center; justify-content: center; }
+    .af-hot  { background: linear-gradient(0deg, rgba(249,115,22,0.18) 0%, rgba(249,115,22,0.04) 100%); border: 1px solid rgba(249,115,22,0.22); display: flex; align-items: center; justify-content: center; }
+    .af-lbl { font-size: 0.43rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .af-cold .af-lbl { color: #7dd3fc; }
+    .af-hot  .af-lbl { color: #fdba74; }
 
-    /* ── DLC view ──────────────────────────── */
-    .dlc-chain { display: flex; align-items: center; gap: 0.3rem; }
-    .dlc-chain > * { flex-shrink: 0; }
-    .dlc-node { border-radius: 6px; padding: 0.4rem 0.5rem; font-size: 0.62rem; font-weight: 700; text-align: center; }
-    .dlc-node.cdu  { background: #040f1f; border: 1px solid #1d4ed8; color: #60a5fa; flex: 1; }
-    .dlc-node.hx   { background: #1a0a00; border: 1px solid #c2410c; color: #fb923c; flex: 1; }
-    .dlc-node.bldg { background: #0d1a0d; border: 1px solid #166534; color: #4ade80; flex: 1.2; font-size: 0.55rem; }
-    .chain-arrow { color: var(--text-muted); font-size: 0.65rem; }
-    .dlc-conn-label { font-size: 0.55rem; color: #60a5fa; padding-left: 0.25rem; }
+    /* DLC view */
+    .fr { stroke-dasharray:5 4; animation:fr-a .9s linear infinite; }
+    .fl { stroke-dasharray:5 4; animation:fl-a .9s linear infinite; }
+    @keyframes fr-a { to{stroke-dashoffset:-18} }
+    @keyframes fl-a { to{stroke-dashoffset:18} }
+    .imp-g { transform-box: fill-box; transform-origin: center; animation: spin 1.3s linear infinite; }
+    .bldg-badge { background: #0d1a0d; border: 1px solid #166534; border-radius: 5px; padding: 0.25rem 0.45rem; font-size: 0.52rem; font-weight: 600; color: #4ade80; white-space: nowrap; text-align: center; line-height: 1.4; }
+    .dlc-row { display: flex; align-items: center; gap: 0.3rem; }
+    .chain-arr { color: var(--text-muted); font-size: 0.58rem; flex-shrink: 0; }
 
-    /* ── Server racks ──────────────────────── */
-    .racks { display: flex; gap: 0.35rem; }
-    .rack { flex: 1; background: #0a0f16; border: 1px solid #21262d; border-radius: 4px; padding: 0.35rem 0.25rem; display: flex; flex-direction: column; gap: 2px; }
-    .rack-lbl { font-size: 0.48rem; color: var(--text-muted); text-align: center; margin-bottom: 2px; }
-    .rack-u { height: 6px; background: #1a2030; border-radius: 1px; display: flex; align-items: center; padding: 0 2px; gap: 2px; }
-    .led { width: 3px; height: 3px; border-radius: 50%; }
-    .led.g { background: #22c55e; box-shadow: 0 0 3px rgba(34,197,94,0.6); animation: blink 5s ease-in-out infinite; }
-    .led.b { background: #3b82f6; animation: blink 7s ease-in-out infinite; animation-delay: 2s; }
-    .led.x { background: #374151; }
-    @keyframes blink { 0%,93%,100% { opacity: 1; } 96% { opacity: 0.1; } }
+    /* DLC → rack pipe connection */
+    .dlc-rack-conn { height: 22px; position: relative; }
+    .dlc-rack-conn::before { content:''; position:absolute; left:22%; width:2px; top:0; bottom:0; background:linear-gradient(180deg,#2563eb,#3b82f6); }
+    .dlc-rack-conn::after  { content:''; position:absolute; right:22%; width:2px; top:0; bottom:0; background:linear-gradient(180deg,#ea580c,#f97316); }
 
-    /* ── TSU ───────────────────────────────── */
+    /* rack connection tops */
+    .rack-tops { display: flex; gap: 0.5rem; margin-bottom: 0; }
+    .rack-top-seg { flex: 1; height: 6px; border-radius: 2px 2px 0 0; }
+    .rtop-crah-cold { background:rgba(37,99,235,0.4); border-top:1.5px solid rgba(59,130,246,0.6); }
+    .rtop-crah-hot  { background:rgba(194,65,12,0.3);  border-top:1.5px solid rgba(249,115,22,0.5); }
+    .rtop-dlc { background:linear-gradient(90deg,transparent 19%,rgba(37,99,235,0.6) 20%,rgba(37,99,235,0.6) 22%,transparent 22%,transparent 78%,rgba(234,88,12,0.6) 78%,rgba(234,88,12,0.6) 80%,transparent 80%); border-top:1px solid rgba(37,99,235,0.3); }
+
+    /* rack LEDs */
+    @keyframes lb { 0%,100%{opacity:1} 50%{opacity:.1} }
+    .l1{animation:lb 1.1s ease-in-out infinite}
+    .l2{animation:lb 1.1s ease-in-out infinite .28s}
+    .l3{animation:lb 1.1s ease-in-out infinite .56s}
+    .l4{animation:lb 1.1s ease-in-out infinite .14s}
+    .l5{animation:lb 1.1s ease-in-out infinite .42s}
+    .l6{animation:lb 1.1s ease-in-out infinite .7s}
+    .racks-row { display: flex; gap: 0.5rem; }
+    .rack-wrap { flex: 1; display: flex; flex-direction: column; }
+    .rack-lbl { font-size: 0.46rem; color: var(--text-muted); text-align: center; padding: 1px 0 2px; }
+
+    /* TSU */
     .tsu-soc-pct { font-size: 0.65rem; color: #60a5fa; font-variant-numeric: tabular-nums; font-weight: 600; }
     .tsu-box { background: #040f1f; border: 1px solid #1a3a6a; border-radius: 8px; padding: 0.65rem; display: flex; flex-direction: column; gap: 0.6rem; }
     .tsu-mods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
@@ -115,39 +157,15 @@
     .tsu-m.em { background: #060d1a; border-color: #111e30; }
     @keyframes ice-sheen { 0%,60%,100% { background-position: -100% 0; } 30% { background-position: 200% 0; } }
     .tsu-soc-track { height: 5px; background: #0a1628; border-radius: 3px; overflow: hidden; }
-    .tsu-soc-fill { height: 100%; background: linear-gradient(90deg, #1d4ed8, #60a5fa); border-radius: 3px; transition: width 1s ease; }
+    .tsu-soc-fill { height: 100%; background: linear-gradient(90deg, #1d4ed8, #60a5fa); border-radius: 3px; }
 
-    /* ── Glycol chiller ────────────────────── */
-    .glycol-chiller { background: #071428; border: 1px solid #21262d; border-radius: 8px; padding: 0.65rem 0.9rem; display: flex; flex-direction: column; gap: 0.45rem; }
-    .glycol-chiller.on { border-color: #22c55e; box-shadow: 0 0 12px rgba(34,197,94,0.08); }
-    .gc-header { display: flex; align-items: center; justify-content: space-between; }
-    .gc-name { font-size: 0.78rem; font-weight: 600; }
-    .gc-wave { height: 18px; border-radius: 4px; background: linear-gradient(90deg, #040f1f 0%, #1d4ed8 25%, #60a5fa 50%, #1d4ed8 75%, #040f1f 100%); background-size: 200% 100%; animation: gc-cool 2.2s ease-in-out infinite; }
-    @keyframes gc-cool { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
-
-    /* ── Pumps ─────────────────────────────── */
-    .pumps { display: flex; gap: 0.5rem; }
-    .pump { flex: 1; background: #071428; border: 1px solid #21262d; border-radius: 8px; padding: 0.55rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
-    .pump-visual { width: 38px; height: 38px; position: relative; display: flex; align-items: center; justify-content: center; }
-    .pump-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 1.5px solid #3b82f6; animation: pump-expand 1.8s ease-out infinite; opacity: 0; }
-    .pump-ring:nth-child(2) { animation-delay: 0.6s; }
-    .pump-ring:nth-child(3) { animation-delay: 1.2s; }
-    @keyframes pump-expand { 0% { transform: scale(0.25); opacity: 0.75; } 100% { transform: scale(1.05); opacity: 0; } }
-    .pump-core { width: 16px; height: 16px; background: #1d4ed8; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: 700; color: white; position: relative; z-index: 1; }
-    .pump-lbl { font-size: 0.58rem; color: var(--text-muted); }
-
-    /* ── Center: Heat Exchanger ────────────── */
-    .center-col { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem 0; }
-    .hx-box { background: var(--surface); border: 1px solid #f97316; border-radius: 10px; padding: 1rem 0.6rem; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; box-shadow: 0 0 20px rgba(249,115,22,0.08); }
-    .hx-title { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: #fb923c; font-weight: 700; text-align: center; line-height: 1.4; }
-    .hx-pipe-stack { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-    .hx-p { height: 5px; border-radius: 3px; position: relative; overflow: hidden; }
-    .hx-p.cold { background: #0c1f3a; border: 1px solid #1d4ed8; }
-    .hx-p.warm { background: #1a0800; border: 1px solid #c2410c; }
-    .hx-p::after { content: ''; position: absolute; inset: 0; animation: pipe-scroll 1.4s linear infinite; }
-    .hx-p.cold::after { background-image: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(59,130,246,0.4) 5px, rgba(59,130,246,0.4) 10px); background-size: 18px 100%; }
-    .hx-p.warm::after { background-image: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(249,115,22,0.4) 5px, rgba(249,115,22,0.4) 10px); background-size: 18px 100%; animation-direction: reverse; }
-    .hx-note { font-size: 0.55rem; color: var(--text-muted); text-align: center; line-height: 1.5; }
+    /* center HX */
+    .center-col { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.5rem 0; }
+    .hx-label { font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.08em; color: #fb923c; font-weight: 700; text-align: center; margin-bottom: 0.3rem; }
+    @keyframes hx-r { to { stroke-dashoffset: -20; } }
+    @keyframes hx-l { to { stroke-dashoffset: 20; } }
+    .hr { stroke-dasharray: 6 4; animation: hx-r 0.75s linear infinite; }
+    .hl { stroke-dasharray: 6 4; animation: hx-l 0.75s linear infinite; }
   </style>
 </head>
 <body>
@@ -169,7 +187,7 @@
 
     <div class="ops-page">
 
-      <!-- ── Grid Meter ───────────────────── -->
+      <!-- ── Grid Meter ─────────────────────────────── -->
       <div class="grid-section">
         <div class="grid-meter-card">
           <svg width="68" height="68" viewBox="0 0 68 68">
@@ -180,23 +198,23 @@
             </circle>
             <text x="34" y="40" text-anchor="middle" fill="#58a6ff" font-size="17">⚡</text>
           </svg>
-          <div class="meter-info">
+          <div>
             <div class="meter-title">Main Grid Connection</div>
             <div class="meter-value" id="meterVal">1.24 MW</div>
             <div class="meter-sub">Active import · 480 V / 3φ</div>
           </div>
         </div>
-        <svg class="wire-svg" viewBox="0 0 1200 44" preserveAspectRatio="none">
-          <line x1="600" y1="0" x2="600" y2="16" stroke="#58a6ff" stroke-width="2" opacity="0.5"/>
-          <line x1="600" y1="16" x2="120"  y2="44" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.35"/>
-          <line x1="600" y1="16" x2="1080" y2="44" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.35"/>
+        <svg class="wire-svg" viewBox="0 0 1280 44" preserveAspectRatio="none">
+          <line x1="640" y1="0" x2="640" y2="16" stroke="#58a6ff" stroke-width="2" opacity="0.5"/>
+          <line x1="640" y1="16" x2="120"  y2="44" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.35"/>
+          <line x1="640" y1="16" x2="1160" y2="44" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.35"/>
         </svg>
       </div>
 
-      <!-- ── Systems ──────────────────────── -->
+      <!-- ── Systems Row ─────────────────────────────── -->
       <div class="systems-row">
 
-        <!-- ── LEFT: Data Center ──────────── -->
+        <!-- ══ LEFT: Data Center ══════════════════════ -->
         <div class="sys-panel">
           <div class="sys-panel-header">
             Data Center
@@ -211,121 +229,432 @@
           </div>
           <div class="sys-panel-body">
 
-            <!-- Chiller plant -->
+            <!-- Chiller Plant -->
             <div>
               <div class="comp-head"><span class="comp-title">Chiller Plant</span></div>
               <div class="chiller-plant">
                 <div class="dc-chiller on">
-                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/><g class="fan-g"><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity="0.85"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity="0.85"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity="0.85"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity="0.85"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/></svg>
+                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/><g class="fan-g"><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity=".85"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity=".85"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity=".85"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity=".85"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/></svg>
                   <span class="dc-chiller-id">CH-01</span>
                 </div>
                 <div class="dc-chiller on">
-                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/><g class="fan-g"><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity="0.85"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity="0.85"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity="0.85"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity="0.85"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/></svg>
+                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/><g class="fan-g"><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity=".85"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity=".85"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity=".85"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity=".85"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/></svg>
                   <span class="dc-chiller-id">CH-02</span>
                 </div>
                 <div class="dc-chiller on">
-                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/><g class="fan-g"><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity="0.85"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity="0.85"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity="0.85"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity="0.85"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/></svg>
+                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#1d4ed8" stroke-width="1.5"/><g class="fan-g"><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#3b82f6" opacity=".85"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#3b82f6" opacity=".85"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#3b82f6" opacity=".85"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#3b82f6" opacity=".85"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#60a5fa" stroke-width="1"/></svg>
                   <span class="dc-chiller-id">CH-03</span>
                 </div>
                 <div class="dc-chiller off">
-                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#374151" stroke-width="1.5"/><g><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#4b5563" opacity="0.5"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#4b5563" opacity="0.5"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#4b5563" opacity="0.5"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#4b5563" opacity="0.5"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#6b7280" stroke-width="1"/></svg>
+                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#374151" stroke-width="1.5"/><g><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#4b5563" opacity=".5"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#4b5563" opacity=".5"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#4b5563" opacity=".5"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#4b5563" opacity=".5"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#6b7280" stroke-width="1"/></svg>
                   <span class="dc-chiller-id">CH-04</span>
                 </div>
                 <div class="dc-chiller off">
-                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#374151" stroke-width="1.5"/><g><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#4b5563" opacity="0.5"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#4b5563" opacity="0.5"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#4b5563" opacity="0.5"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#4b5563" opacity="0.5"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#6b7280" stroke-width="1"/></svg>
+                  <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#071428" stroke="#374151" stroke-width="1.5"/><g><path d="M15 4 Q17 10 15 15 Q13 10 15 4" fill="#4b5563" opacity=".5"/><path d="M26 15 Q20 17 15 15 Q20 13 26 15" fill="#4b5563" opacity=".5"/><path d="M15 26 Q13 20 15 15 Q17 20 15 26" fill="#4b5563" opacity=".5"/><path d="M4 15 Q10 13 15 15 Q10 17 4 15" fill="#4b5563" opacity=".5"/></g><circle cx="15" cy="15" r="2.5" fill="#0d1117" stroke="#6b7280" stroke-width="1"/></svg>
                   <span class="dc-chiller-id">CH-05</span>
                 </div>
               </div>
             </div>
 
-            <!-- DC pipes -->
-            <div class="pipes">
-              <div class="pipe cold"><div class="pipe-flow"></div><span class="pipe-tag">Chilled Water Supply</span></div>
-              <div class="pipe warm"><div class="pipe-flow"></div><span class="pipe-tag">Chilled Water Return</span></div>
-            </div>
-
-            <!-- ── Cooling mode views (above racks) ── -->
-
-            <!-- CRAH view -->
-            <div class="mode-view show" id="view-crah">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem">
-                <div class="crah-units">
-                  <div class="crah-u">
-                    <svg width="24" height="20" viewBox="0 0 24 20"><rect width="24" height="20" rx="2" fill="#071428" stroke="#1a3a6a"/><line x1="4" y1="5" x2="20" y2="5" stroke="#60a5fa" stroke-width="1"/><line x1="4" y1="9" x2="20" y2="9" stroke="#60a5fa" stroke-width="1"/><line x1="4" y1="13" x2="20" y2="13" stroke="#60a5fa" stroke-width="1"/><path d="M12 18 L10 14 L14 14 Z" fill="#60a5fa" opacity="0.7"/></svg>
-                    <span class="crah-u-lbl">CRAH-1</span>
-                  </div>
-                  <div class="crah-u">
-                    <svg width="24" height="20" viewBox="0 0 24 20"><rect width="24" height="20" rx="2" fill="#071428" stroke="#1a3a6a"/><line x1="4" y1="5" x2="20" y2="5" stroke="#60a5fa" stroke-width="1"/><line x1="4" y1="9" x2="20" y2="9" stroke="#60a5fa" stroke-width="1"/><line x1="4" y1="13" x2="20" y2="13" stroke="#60a5fa" stroke-width="1"/><path d="M12 18 L10 14 L14 14 Z" fill="#60a5fa" opacity="0.7"/></svg>
-                    <span class="crah-u-lbl">CRAH-2</span>
-                  </div>
-                  <div class="crah-u">
-                    <svg width="24" height="20" viewBox="0 0 24 20"><rect width="24" height="20" rx="2" fill="#071428" stroke="#1a3a6a"/><line x1="4" y1="5" x2="20" y2="5" stroke="#60a5fa" stroke-width="1"/><line x1="4" y1="9" x2="20" y2="9" stroke="#60a5fa" stroke-width="1"/><line x1="4" y1="13" x2="20" y2="13" stroke="#60a5fa" stroke-width="1"/><path d="M12 18 L10 14 L14 14 Z" fill="#60a5fa" opacity="0.7"/></svg>
-                    <span class="crah-u-lbl">CRAH-3</span>
-                  </div>
-                </div>
-                <div class="bldg-badge" style="font-size:0.52rem">Building Loop<br><span class="loop-note" style="color:#4ade80;opacity:0.7">1 loop</span></div>
+            <!-- DC pipes with pumps on top -->
+            <div class="pipe-canvas">
+              <div class="pump-on-pipe pump-cold">
+                <div class="pump-visual"><div class="pump-ring"></div><div class="pump-ring"></div><div class="pump-ring"></div><div class="pump-core">P</div></div>
+                <span class="pump-lbl">P-01</span>
               </div>
-              <div class="aisle-row">
-                <div class="aisle-seg cold">↓ Cold Air<br>Cold Aisle</div>
-                <div class="aisle-seg hot">Hot Aisle<br>Hot Air ↑</div>
-              </div>
-              <div class="aisle-conn-note">↓ connects to racks below</div>
-            </div>
-
-            <!-- DLC view -->
-            <div class="mode-view" id="view-dlc">
-              <div class="dlc-chain">
-                <div class="dlc-node cdu">CDU<br><span style="font-size:0.5rem;font-weight:400;color:var(--text-muted)">Cooling Dist.</span></div>
-                <span class="chain-arrow">↔</span>
-                <div class="dlc-node hx">HX<br><span style="font-size:0.5rem;font-weight:400;color:var(--text-muted)">Loop isolator</span></div>
-                <span class="chain-arrow">↔</span>
-                <div class="dlc-node bldg">Building<br>Loop<br><span style="font-size:0.48rem;font-weight:400;opacity:0.7">2 loops</span></div>
+              <div class="pump-on-pipe pump-warm">
+                <div class="pump-visual"><div class="pump-ring"></div><div class="pump-ring"></div><div class="pump-ring"></div><div class="pump-core">P</div></div>
+                <span class="pump-lbl">P-02</span>
               </div>
               <div class="pipes">
-                <div class="pipe cold" style="height:11px"><div class="pipe-flow"></div><span class="pipe-tag">Liquid cooling loop (inner)</span></div>
+                <div class="pipe cold"><div class="pipe-flow"></div><span class="pipe-tag">Chilled Water Supply</span></div>
+                <div class="pipe warm"><div class="pipe-flow"></div><span class="pipe-tag">Chilled Water Return</span></div>
               </div>
-              <div class="aisle-conn-note">↓ cold plates on each server chip</div>
             </div>
 
-            <!-- ── Racks — always visible ─────────── -->
+            <!-- ── CRAH view ── -->
+            <div class="mode-view show" id="view-crah">
+              <div class="comp-head"><span class="comp-title">CRAH Units</span><span style="font-size:0.5rem;color:#4ade80">Building Loop · 1 circuit</span></div>
+              <div class="crah-units-row">
+                <!-- CRAH-1 -->
+                <div class="crah-unit-wrap">
+                  <svg width="100%" viewBox="0 0 80 98" style="max-width:90px">
+                    <!-- hot air intake top -->
+                    <rect x="0" y="0" width="80" height="16" rx="3" fill="#2a0e04"/>
+                    <line x1="13" y1="0" x2="13" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="26" y1="0" x2="26" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="40" y1="0" x2="40" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="54" y1="0" x2="54" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="67" y1="0" x2="67" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <!-- card body -->
+                    <rect x="0" y="15" width="80" height="83" rx="0 0 3 3" fill="#111318" stroke="#d4690a" stroke-width="1"/>
+                    <!-- fan section -->
+                    <rect x="4" y="19" width="72" height="44" rx="3" fill="#191b21" stroke="#2e3040" stroke-width="0.8"/>
+                    <!-- fan -->
+                    <circle cx="40" cy="41" r="17" fill="#1e2028" stroke="#44485a" stroke-width="1.2"/>
+                    <circle cx="40" cy="41" r="14" fill="#141620" stroke="#30333e" stroke-width="0.8"/>
+                    <g class="crah-fan-g">
+                      <path d="M40 41 Q44 33 40 26 Q36 33 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q48 37 52 41 Q48 45 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q36 49 40 56 Q44 49 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q32 45 28 41 Q32 37 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q46 33 48 26 Q42 33 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q48 48 50 55 Q43 48 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q34 49 32 56 Q37 49 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q32 33 34 26 Q38 33 40 41Z" fill="#4c5060" opacity=".65"/>
+                    </g>
+                    <circle cx="40" cy="41" r="4" fill="#1e2028" stroke="#555a6a" stroke-width="0.8"/>
+                    <circle cx="40" cy="41" r="1.8" fill="#777a8a"/>
+                    <!-- cold air output -->
+                    <rect x="0" y="63" width="80" height="35" fill="#040e1e"/>
+                    <line x1="13" y1="63" x2="13" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="26" y1="63" x2="26" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="40" y1="63" x2="40" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="54" y1="63" x2="54" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="67" y1="63" x2="67" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <!-- cold drops -->
+                    <g class="cd1"><line x1="20" y1="63" x2="20" y2="73" stroke="#4a90d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <g class="cd2"><line x1="40" y1="63" x2="40" y2="73" stroke="#5090d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <g class="cd3"><line x1="60" y1="63" x2="60" y2="73" stroke="#4a90d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <!-- water stubs right -->
+                    <rect x="72" y="67" width="8" height="5" rx="1" fill="#081828" stroke="#2060a8" stroke-width="0.8"/>
+                    <rect x="72" y="75" width="8" height="5" rx="1" fill="#1e0c06" stroke="#a03010" stroke-width="0.8"/>
+                  </svg>
+                  <span class="crah-lbl">CRAH-1</span>
+                </div>
+                <!-- CRAH-2 -->
+                <div class="crah-unit-wrap">
+                  <svg width="100%" viewBox="0 0 80 98" style="max-width:90px">
+                    <rect x="0" y="0" width="80" height="16" rx="3" fill="#2a0e04"/>
+                    <line x1="13" y1="0" x2="13" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="26" y1="0" x2="26" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="40" y1="0" x2="40" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="54" y1="0" x2="54" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="67" y1="0" x2="67" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <rect x="0" y="15" width="80" height="83" rx="0 0 3 3" fill="#111318" stroke="#d4690a" stroke-width="1"/>
+                    <rect x="4" y="19" width="72" height="44" rx="3" fill="#191b21" stroke="#2e3040" stroke-width="0.8"/>
+                    <circle cx="40" cy="41" r="17" fill="#1e2028" stroke="#44485a" stroke-width="1.2"/>
+                    <circle cx="40" cy="41" r="14" fill="#141620" stroke="#30333e" stroke-width="0.8"/>
+                    <g class="crah-fan-g" style="animation-delay:0.4s">
+                      <path d="M40 41 Q44 33 40 26 Q36 33 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q48 37 52 41 Q48 45 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q36 49 40 56 Q44 49 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q32 45 28 41 Q32 37 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q46 33 48 26 Q42 33 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q48 48 50 55 Q43 48 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q34 49 32 56 Q37 49 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q32 33 34 26 Q38 33 40 41Z" fill="#4c5060" opacity=".65"/>
+                    </g>
+                    <circle cx="40" cy="41" r="4" fill="#1e2028" stroke="#555a6a" stroke-width="0.8"/>
+                    <circle cx="40" cy="41" r="1.8" fill="#777a8a"/>
+                    <rect x="0" y="63" width="80" height="35" fill="#040e1e"/>
+                    <line x1="13" y1="63" x2="13" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="26" y1="63" x2="26" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="40" y1="63" x2="40" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="54" y1="63" x2="54" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="67" y1="63" x2="67" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <g class="cd2"><line x1="20" y1="63" x2="20" y2="73" stroke="#4a90d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <g class="cd3"><line x1="40" y1="63" x2="40" y2="73" stroke="#5090d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <g class="cd1"><line x1="60" y1="63" x2="60" y2="73" stroke="#4a90d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <rect x="72" y="67" width="8" height="5" rx="1" fill="#081828" stroke="#2060a8" stroke-width="0.8"/>
+                    <rect x="72" y="75" width="8" height="5" rx="1" fill="#1e0c06" stroke="#a03010" stroke-width="0.8"/>
+                  </svg>
+                  <span class="crah-lbl">CRAH-2</span>
+                </div>
+                <!-- CRAH-3 -->
+                <div class="crah-unit-wrap">
+                  <svg width="100%" viewBox="0 0 80 98" style="max-width:90px">
+                    <rect x="0" y="0" width="80" height="16" rx="3" fill="#2a0e04"/>
+                    <line x1="13" y1="0" x2="13" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="26" y1="0" x2="26" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="40" y1="0" x2="40" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="54" y1="0" x2="54" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <line x1="67" y1="0" x2="67" y2="16" stroke="#5a2010" stroke-width="1"/>
+                    <rect x="0" y="15" width="80" height="83" rx="0 0 3 3" fill="#111318" stroke="#d4690a" stroke-width="1"/>
+                    <rect x="4" y="19" width="72" height="44" rx="3" fill="#191b21" stroke="#2e3040" stroke-width="0.8"/>
+                    <circle cx="40" cy="41" r="17" fill="#1e2028" stroke="#44485a" stroke-width="1.2"/>
+                    <circle cx="40" cy="41" r="14" fill="#141620" stroke="#30333e" stroke-width="0.8"/>
+                    <g class="crah-fan-g" style="animation-delay:0.8s">
+                      <path d="M40 41 Q44 33 40 26 Q36 33 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q48 37 52 41 Q48 45 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q36 49 40 56 Q44 49 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q32 45 28 41 Q32 37 40 41Z" fill="#3c404e" opacity=".9"/>
+                      <path d="M40 41 Q46 33 48 26 Q42 33 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q48 48 50 55 Q43 48 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q34 49 32 56 Q37 49 40 41Z" fill="#4c5060" opacity=".65"/>
+                      <path d="M40 41 Q32 33 34 26 Q38 33 40 41Z" fill="#4c5060" opacity=".65"/>
+                    </g>
+                    <circle cx="40" cy="41" r="4" fill="#1e2028" stroke="#555a6a" stroke-width="0.8"/>
+                    <circle cx="40" cy="41" r="1.8" fill="#777a8a"/>
+                    <rect x="0" y="63" width="80" height="35" fill="#040e1e"/>
+                    <line x1="13" y1="63" x2="13" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="26" y1="63" x2="26" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="40" y1="63" x2="40" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="54" y1="63" x2="54" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <line x1="67" y1="63" x2="67" y2="98" stroke="#0a2a4a" stroke-width="1"/>
+                    <g class="cd3"><line x1="20" y1="63" x2="20" y2="73" stroke="#4a90d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <g class="cd1"><line x1="40" y1="63" x2="40" y2="73" stroke="#5090d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <g class="cd2"><line x1="60" y1="63" x2="60" y2="73" stroke="#4a90d8" stroke-width="1.5" stroke-linecap="round"/></g>
+                    <rect x="72" y="67" width="8" height="5" rx="1" fill="#081828" stroke="#2060a8" stroke-width="0.8"/>
+                    <rect x="72" y="75" width="8" height="5" rx="1" fill="#1e0c06" stroke="#a03010" stroke-width="0.8"/>
+                  </svg>
+                  <span class="crah-lbl">CRAH-3</span>
+                </div>
+              </div>
+              <!-- airflow connects down to racks -->
+              <div class="airflow-conn">
+                <div class="af-cold"><span class="af-lbl">↓ Cold Air · Cold Aisle</span></div>
+                <div class="af-hot"><span class="af-lbl">Hot Aisle · Hot Air ↑</span></div>
+              </div>
+            </div>
+
+            <!-- ── DLC view ── -->
+            <div class="mode-view" id="view-dlc">
+              <div class="comp-head"><span class="comp-title">CDU · Cooling Distribution</span></div>
+              <!-- CDU with spinning pump -->
+              <div class="cdu-visual">
+                <svg width="100%" viewBox="0 0 300 88" style="display:block">
+                  <!-- housing -->
+                  <rect x="0" y="0" width="300" height="88" rx="5" fill="#040f1f" stroke="#1d4ed8" stroke-width="1.2"/>
+                  <!-- header bezel -->
+                  <rect x="0" y="0" width="300" height="18" rx="5 5 0 0" fill="#0a1830"/>
+                  <rect x="8" y="5" width="70" height="8" rx="1.5" fill="#060e1c" stroke="#112040" stroke-width="0.4"/>
+                  <rect x="82" y="5" width="36" height="8" rx="1.5" fill="#060e1c" stroke="#112040" stroke-width="0.4"/>
+                  <circle cx="240" cy="9" r="3" fill="#0d2a0d" stroke="#1a5a1a" stroke-width="0.6"/>
+                  <circle cx="252" cy="9" r="3" fill="#0d2a0d" stroke="#1a5a1a" stroke-width="0.6"/>
+                  <circle cx="264" cy="9" r="3" fill="#1a1a08" stroke="#404010" stroke-width="0.6"/>
+                  <!-- supply manifold left (blue) -->
+                  <rect x="8" y="22" width="14" height="60" rx="6" fill="#081428" stroke="#2060a0" stroke-width="1.2"/>
+                  <line x1="8" y1="42" x2="22" y2="42" stroke="#1a4878" stroke-width="0.6"/>
+                  <line x1="8" y1="56" x2="22" y2="56" stroke="#1a4878" stroke-width="0.6"/>
+                  <line x1="8" y1="70" x2="22" y2="70" stroke="#1a4878" stroke-width="0.6"/>
+                  <!-- return manifold right (red) -->
+                  <rect x="278" y="22" width="14" height="60" rx="6" fill="#1e0c06" stroke="#a03010" stroke-width="1.2"/>
+                  <line x1="278" y1="42" x2="292" y2="42" stroke="#7a2010" stroke-width="0.6"/>
+                  <line x1="278" y1="56" x2="292" y2="56" stroke="#7a2010" stroke-width="0.6"/>
+                  <line x1="278" y1="70" x2="292" y2="70" stroke="#7a2010" stroke-width="0.6"/>
+                  <!-- flow lines manifold → pump -->
+                  <line class="fr" x1="22" y1="52" x2="118" y2="52" stroke="#4a90d8" stroke-width="2" stroke-linecap="round"/>
+                  <!-- flow lines pump → manifold -->
+                  <line class="fl" x1="182" y1="52" x2="278" y2="52" stroke="#e05030" stroke-width="2" stroke-linecap="round"/>
+                  <!-- pump housing -->
+                  <circle cx="150" cy="52" r="30" fill="#1a1c24" stroke="#44485a" stroke-width="1.4"/>
+                  <circle cx="150" cy="52" r="25" fill="#111318" stroke="#303548" stroke-width="0.8"/>
+                  <!-- impeller -->
+                  <g class="imp-g">
+                    <path d="M150 52 L150 28 A24 24 0 0 1 165 34 Z" fill="#2e3240" opacity=".9"/>
+                    <path d="M150 52 L165 34 A24 24 0 0 1 174 52 Z" fill="#353848" opacity=".85"/>
+                    <path d="M150 52 L174 52 A24 24 0 0 1 165 70 Z" fill="#2e3240" opacity=".9"/>
+                    <path d="M150 52 L165 70 A24 24 0 0 1 150 76 Z" fill="#353848" opacity=".85"/>
+                    <path d="M150 52 L150 76 A24 24 0 0 1 135 70 Z" fill="#2e3240" opacity=".9"/>
+                    <path d="M150 52 L135 70 A24 24 0 0 1 126 52 Z" fill="#353848" opacity=".85"/>
+                    <path d="M150 52 L126 52 A24 24 0 0 1 135 34 Z" fill="#2e3240" opacity=".9"/>
+                    <path d="M150 52 L135 34 A24 24 0 0 1 150 28 Z" fill="#353848" opacity=".85"/>
+                  </g>
+                  <circle cx="150" cy="52" r="8" fill="#1e2028" stroke="#555a6a" stroke-width="1"/>
+                  <circle cx="150" cy="52" r="3.5" fill="#2e3240"/>
+                  <!-- port stubs bottom: supply in / return out -->
+                  <rect x="14" y="80" width="10" height="8" rx="2" fill="#081828" stroke="#2a6ab8" stroke-width="1.2"/>
+                  <rect x="276" y="80" width="10" height="8" rx="2" fill="#1e0c06" stroke="#b83020" stroke-width="1.2"/>
+                  <circle cx="19" cy="80" r="2.5" fill="#2060a0"/>
+                  <circle cx="281" cy="80" r="2.5" fill="#a03010"/>
+                </svg>
+              </div>
+              <!-- chain: CDU → building loop -->
+              <div class="dlc-row">
+                <div class="bldg-badge">Building Loop<br><span style="font-size:0.46rem;opacity:0.7;color:var(--text-muted)">2 isolated circuits</span></div>
+                <span class="chain-arr">←</span>
+                <div style="flex:1;background:#040f1f;border:1px solid #1d4ed8;border-radius:5px;padding:0.25rem 0.4rem;font-size:0.52rem;font-weight:700;color:#60a5fa;text-align:center">→ HX → TES</div>
+              </div>
+              <!-- pipe stubs going down to racks -->
+              <div class="dlc-rack-conn"></div>
+            </div>
+
+            <!-- ── Racks — always visible ── -->
             <div>
               <div class="comp-head"><span class="comp-title">Server Racks</span></div>
-              <div class="racks">
-                <div class="rack">
+              <!-- rack top connection strips — swapped by mode -->
+              <div id="rack-tops-crah" class="rack-tops">
+                <div class="rack-top-seg rtop-crah-cold"></div>
+                <div class="rack-top-seg rtop-crah-hot"></div>
+              </div>
+              <div id="rack-tops-dlc" class="rack-tops" style="display:none">
+                <div class="rack-top-seg rtop-dlc"></div>
+                <div class="rack-top-seg rtop-dlc"></div>
+              </div>
+              <div class="racks-row">
+                <!-- RACK-A -->
+                <div class="rack-wrap">
+                  <svg width="100%" viewBox="0 0 110 172" style="display:block">
+                    <rect x="1" y="1" width="108" height="170" rx="4" fill="#111318" stroke="#d4690a" stroke-width="1.2"/>
+                    <rect x="6" y="6" width="98" height="160" rx="3" fill="#181a20" stroke="#3a3d48" stroke-width="0.6"/>
+                    <rect x="6" y="6" width="8" height="160" fill="#22252e" stroke="#3a3d48" stroke-width="0.4"/>
+                    <rect x="96" y="6" width="8" height="160" fill="#22252e" stroke="#3a3d48" stroke-width="0.4"/>
+                    <!-- rail marks -->
+                    <rect x="7" y="12" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="22" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="32" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="42" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="52" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="62" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="72" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="82" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="92" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="102" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="112" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="122" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="132" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="142" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="152" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <!-- 1U servers -->
+                    <rect x="14" y="9"  width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l1" cx="18" cy="13.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="13.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="11" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="11" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="70" y="11" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <rect x="14" y="20" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l2" cx="18" cy="24.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="24.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="22" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="22" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="70" y="22" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <rect x="14" y="31" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l3" cx="18" cy="35.5" r="1.6" fill="#f59e0b"/>
+                    <circle cx="23" cy="35.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="33" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="33" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="70" y="33" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <rect x="14" y="42" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l4" cx="18" cy="46.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="46.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="44" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="44" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="70" y="44" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <rect x="14" y="53" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l5" cx="18" cy="57.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="57.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="55" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="55" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="70" y="55" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <rect x="14" y="64" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l6" cx="18" cy="68.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="68.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="66" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <!-- 2U switch -->
+                    <rect x="14" y="75" width="82" height="17" rx="1.5" fill="#14182a" stroke="#2a3058" stroke-width="0.6"/>
+                    <circle class="l1" cx="18" cy="83.5" r="2" fill="#3b6dd4"/>
+                    <circle class="l3" cx="24" cy="83.5" r="2" fill="#3b6dd4"/>
+                    <rect x="30" y="78" width="32" height="10" rx="1.5" fill="#0e1020" stroke="#202540" stroke-width="0.4"/>
+                    <rect x="66" y="78" width="12" height="5" rx="0.8" fill="#0e1020" stroke="#202540" stroke-width="0.3"/>
+                    <rect x="66" y="86" width="12" height="4" rx="0.8" fill="#0e1020" stroke="#202540" stroke-width="0.3"/>
+                    <rect x="82" y="78" width="12" height="5" rx="0.8" fill="#0e1020" stroke="#202540" stroke-width="0.3"/>
+                    <rect x="82" y="86" width="12" height="4" rx="0.8" fill="#0e1020" stroke="#202540" stroke-width="0.3"/>
+
+                    <rect x="14" y="94"  width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l2" cx="18" cy="98.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="98.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="96" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <rect x="14" y="105" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l4" cx="18" cy="109.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="109.5" r="1.6" fill="#f59e0b" opacity=".8"/>
+                    <rect x="28" y="107" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <rect x="14" y="116" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l5" cx="18" cy="120.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="120.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="118" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+
+                    <!-- blank panels -->
+                    <rect x="14" y="127" width="82" height="6" rx="1" fill="#1a1c24" stroke="#2a2d38" stroke-width="0.4"/>
+                    <rect x="14" y="135" width="82" height="6" rx="1" fill="#1a1c24" stroke="#2a2d38" stroke-width="0.4"/>
+                    <rect x="14" y="143" width="82" height="6" rx="1" fill="#1a1c24" stroke="#2a2d38" stroke-width="0.4"/>
+                    <rect x="14" y="151" width="82" height="14" rx="2" fill="#141620" stroke="#2a2d38" stroke-width="0.4"/>
+                  </svg>
                   <div class="rack-lbl">RACK-A</div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led b"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led x"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led b"></span><span class="led g"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led x"></span></div>
-                  <div class="rack-u"><span class="led x"></span><span class="led g"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led b"></span><span class="led g"></span></div>
                 </div>
-                <div class="rack">
+                <!-- RACK-B -->
+                <div class="rack-wrap">
+                  <svg width="100%" viewBox="0 0 110 172" style="display:block">
+                    <rect x="1" y="1" width="108" height="170" rx="4" fill="#111318" stroke="#d4690a" stroke-width="1.2"/>
+                    <rect x="6" y="6" width="98" height="160" rx="3" fill="#181a20" stroke="#3a3d48" stroke-width="0.6"/>
+                    <rect x="6" y="6" width="8" height="160" fill="#22252e" stroke="#3a3d48" stroke-width="0.4"/>
+                    <rect x="96" y="6" width="8" height="160" fill="#22252e" stroke="#3a3d48" stroke-width="0.4"/>
+                    <rect x="7" y="12" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="22" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="32" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="42" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="52" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="62" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="72" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="82" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="92" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="102" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="112" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="122" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="132" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="142" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="7" y="152" width="4" height="3" rx="0.5" fill="#333640"/>
+                    <rect x="14" y="9"  width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l3" cx="18" cy="13.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="13.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="11" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="11" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="70" y="11" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="14" y="20" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l5" cx="18" cy="24.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="24.5" r="1.6" fill="#3b82f6" opacity=".7"/>
+                    <rect x="28" y="22" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="22" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="14" y="31" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l1" cx="18" cy="35.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="35.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="33" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="14" y="42" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l6" cx="18" cy="46.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="46.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="44" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="44" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="70" y="44" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="14" y="53" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l2" cx="18" cy="57.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="57.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="55" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="14" y="64" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l4" cx="18" cy="68.5" r="1.6" fill="#f59e0b"/>
+                    <circle cx="23" cy="68.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="66" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="55" y="66" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="70" y="66" width="12" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="14" y="75" width="82" height="17" rx="1.5" fill="#14182a" stroke="#2a3058" stroke-width="0.6"/>
+                    <circle class="l3" cx="18" cy="83.5" r="2" fill="#3b6dd4"/>
+                    <circle class="l5" cx="24" cy="83.5" r="2" fill="#3b6dd4"/>
+                    <rect x="30" y="78" width="32" height="10" rx="1.5" fill="#0e1020" stroke="#202540" stroke-width="0.4"/>
+                    <rect x="66" y="78" width="12" height="5" rx="0.8" fill="#0e1020" stroke="#202540" stroke-width="0.3"/>
+                    <rect x="82" y="78" width="12" height="5" rx="0.8" fill="#0e1020" stroke="#202540" stroke-width="0.3"/>
+                    <rect x="14" y="94"  width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l6" cx="18" cy="98.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="98.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="28" y="96" width="24" height="5" rx="0.5" fill="#141820" stroke="#252a38" stroke-width="0.3"/>
+                    <rect x="14" y="105" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l1" cx="18" cy="109.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="109.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="14" y="116" width="82" height="9" rx="1.2" fill="#1e2230" stroke="#303548" stroke-width="0.4"/>
+                    <circle class="l2" cx="18" cy="120.5" r="1.6" fill="#22cc44"/>
+                    <circle cx="23" cy="120.5" r="1.6" fill="#22cc44" opacity=".55"/>
+                    <rect x="14" y="127" width="82" height="6" rx="1" fill="#1a1c24" stroke="#2a2d38" stroke-width="0.4"/>
+                    <rect x="14" y="135" width="82" height="6" rx="1" fill="#1a1c24" stroke="#2a2d38" stroke-width="0.4"/>
+                    <rect x="14" y="143" width="82" height="6" rx="1" fill="#1a1c24" stroke="#2a2d38" stroke-width="0.4"/>
+                    <rect x="14" y="151" width="82" height="14" rx="2" fill="#141620" stroke="#2a2d38" stroke-width="0.4"/>
+                  </svg>
                   <div class="rack-lbl">RACK-B</div>
-                  <div class="rack-u"><span class="led g"></span><span class="led x"></span><span class="led b"></span></div>
-                  <div class="rack-u"><span class="led b"></span><span class="led g"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led x"></span><span class="led g"></span><span class="led x"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led b"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led x"></span><span class="led g"></span></div>
-                </div>
-                <div class="rack">
-                  <div class="rack-lbl">RACK-C</div>
-                  <div class="rack-u"><span class="led b"></span><span class="led g"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led x"></span></div>
-                  <div class="rack-u"><span class="led x"></span><span class="led b"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led x"></span><span class="led b"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led g"></span></div>
-                </div>
-                <div class="rack">
-                  <div class="rack-lbl">RACK-D</div>
-                  <div class="rack-u"><span class="led g"></span><span class="led b"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led x"></span><span class="led g"></span><span class="led x"></span></div>
-                  <div class="rack-u"><span class="led b"></span><span class="led x"></span><span class="led g"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led g"></span><span class="led x"></span></div>
-                  <div class="rack-u"><span class="led g"></span><span class="led b"></span><span class="led g"></span></div>
                 </div>
               </div>
             </div>
@@ -333,27 +662,60 @@
           </div>
         </div>
 
-        <!-- ── CENTER: Heat Exchanger ──────── -->
+        <!-- ══ CENTER: Heat Exchanger ════════════════ -->
         <div class="center-col">
-          <div class="hx-box">
-            <div class="hx-title">Heat Exchanger</div>
-            <div class="hx-pipe-stack">
-              <div class="hx-p cold"></div>
-              <div class="hx-p warm"></div>
-              <div class="hx-p cold"></div>
-              <div class="hx-p warm"></div>
-            </div>
-            <svg width="52" height="42" viewBox="0 0 52 42">
-              <path d="M4 10 Q13 10 13 21 Q13 32 22 32 Q31 32 31 21 Q31 10 40 10 Q49 10 49 21"
-                fill="none" stroke="#1d4ed8" stroke-width="2" opacity="0.8" stroke-linecap="round"/>
-              <path d="M4 32 Q13 32 13 21 Q13 10 22 10 Q31 10 31 21 Q31 32 40 32 Q49 32 49 21"
-                fill="none" stroke="#c2410c" stroke-width="2" opacity="0.8" stroke-linecap="round"/>
-            </svg>
-            <div class="hx-note">Glycol ↔ Water</div>
-          </div>
+          <div class="hx-label">Heat<br>Exchanger</div>
+          <svg width="100" height="148" viewBox="72 18 452 420" style="display:block">
+            <!-- end plates -->
+            <rect x="96" y="48" width="22" height="380" rx="4" fill="#2a2d38" stroke="#555a66" stroke-width="1.5"/>
+            <rect x="478" y="48" width="22" height="380" rx="4" fill="#2a2d38" stroke="#555a66" stroke-width="1.5"/>
+            <!-- tie rods -->
+            <line x1="107" y1="48"  x2="489" y2="48"  stroke="#555a66" stroke-width="2"/>
+            <line x1="107" y1="428" x2="489" y2="428" stroke="#555a66" stroke-width="2"/>
+            <!-- port nozzles left (hot) -->
+            <rect x="72" y="70"  width="26" height="20" rx="3" fill="#2e1208" stroke="#a03010" stroke-width="1.8"/>
+            <rect x="72" y="388" width="26" height="20" rx="3" fill="#2e1208" stroke="#a03010" stroke-width="1.8"/>
+            <!-- port nozzles right (cold) -->
+            <rect x="498" y="70"  width="26" height="20" rx="3" fill="#081428" stroke="#2060a8" stroke-width="1.8"/>
+            <rect x="498" y="388" width="26" height="20" rx="3" fill="#081428" stroke="#2060a8" stroke-width="1.8"/>
+            <!-- port circles -->
+            <circle cx="76" cy="80"  r="5" fill="#a03010"/>
+            <circle cx="76" cy="398" r="5" fill="#803010"/>
+            <circle cx="520" cy="80"  r="5" fill="#2060a8"/>
+            <circle cx="520" cy="398" r="5" fill="#105090"/>
+            <!-- plate pack (alternating hot/cold) -->
+            <rect x="118" y="58"  width="360" height="24" rx="2" fill="#2a1006" stroke="#7a2810" stroke-width=".8"/><line class="hr" x1="122" y1="70"  x2="474" y2="70"  stroke="#d04020" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="82"  width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="84"  width="360" height="24" rx="2" fill="#061428" stroke="#1a5090" stroke-width=".8"/><line class="hl" x1="474" y1="96"  x2="122" y2="96"  stroke="#3080c8" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="108" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="110" width="360" height="24" rx="2" fill="#2a1006" stroke="#7a2810" stroke-width=".8"/><line class="hr" x1="122" y1="122" x2="474" y2="122" stroke="#d04020" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="134" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="136" width="360" height="24" rx="2" fill="#061428" stroke="#1a5090" stroke-width=".8"/><line class="hl" x1="474" y1="148" x2="122" y2="148" stroke="#3080c8" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="160" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="162" width="360" height="24" rx="2" fill="#2a1006" stroke="#7a2810" stroke-width=".8"/><line class="hr" x1="122" y1="174" x2="474" y2="174" stroke="#d04020" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="186" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="188" width="360" height="24" rx="2" fill="#061428" stroke="#1a5090" stroke-width=".8"/><line class="hl" x1="474" y1="200" x2="122" y2="200" stroke="#3080c8" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="212" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="214" width="360" height="24" rx="2" fill="#2a1006" stroke="#7a2810" stroke-width=".8"/><line class="hr" x1="122" y1="226" x2="474" y2="226" stroke="#d04020" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="238" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="240" width="360" height="24" rx="2" fill="#061428" stroke="#1a5090" stroke-width=".8"/><line class="hl" x1="474" y1="252" x2="122" y2="252" stroke="#3080c8" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="264" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="266" width="360" height="24" rx="2" fill="#2a1006" stroke="#7a2810" stroke-width=".8"/><line class="hr" x1="122" y1="278" x2="474" y2="278" stroke="#d04020" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="290" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="292" width="360" height="24" rx="2" fill="#061428" stroke="#1a5090" stroke-width=".8"/><line class="hl" x1="474" y1="304" x2="122" y2="304" stroke="#3080c8" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="316" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="318" width="360" height="24" rx="2" fill="#2a1006" stroke="#7a2810" stroke-width=".8"/><line class="hr" x1="122" y1="330" x2="474" y2="330" stroke="#d04020" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="342" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="344" width="360" height="24" rx="2" fill="#061428" stroke="#1a5090" stroke-width=".8"/><line class="hl" x1="474" y1="356" x2="122" y2="356" stroke="#3080c8" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="368" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="370" width="360" height="24" rx="2" fill="#2a1006" stroke="#7a2810" stroke-width=".8"/><line class="hr" x1="122" y1="382" x2="474" y2="382" stroke="#d04020" stroke-width="2" stroke-linecap="round"/>
+            <rect x="118" y="394" width="360" height="2"  rx="1" fill="#30333e"/>
+            <rect x="118" y="396" width="360" height="24" rx="2" fill="#061428" stroke="#1a5090" stroke-width=".8"/><line class="hl" x1="474" y1="408" x2="122" y2="408" stroke="#3080c8" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div style="font-size:0.5rem;color:var(--text-muted);text-align:center;margin-top:0.3rem">Glycol ↔ Water</div>
         </div>
 
-        <!-- ── RIGHT: Icebrick System ──────── -->
+        <!-- ══ RIGHT: Icebrick / TES ══════════════════ -->
         <div class="sys-panel">
           <div class="sys-panel-header">
             Icebrick System
@@ -361,7 +723,7 @@
           </div>
           <div class="sys-panel-body">
 
-            <!-- TSU — single unit, modular grid -->
+            <!-- TSU -->
             <div>
               <div class="comp-head">
                 <span class="comp-title">Thermal Storage Unit</span>
@@ -369,7 +731,6 @@
               </div>
               <div class="tsu-box">
                 <div class="tsu-mods">
-                  <!-- 20 modules, 5×4. 15 charged (top 3 rows), 5 empty (bottom row) -->
                   <div class="tsu-m ch" style="--d:0s"></div>
                   <div class="tsu-m ch" style="--d:0.4s"></div>
                   <div class="tsu-m ch" style="--d:0.8s"></div>
@@ -397,50 +758,85 @@
               </div>
             </div>
 
-            <!-- Glycol Chiller -->
+            <!-- Glycol Chiller — teal, 2 fans, styled like DC chillers -->
             <div>
               <div class="comp-head">
                 <span class="comp-title">Glycol Chiller</span>
                 <span class="dot on"></span>
               </div>
               <div class="glycol-chiller on">
-                <div class="gc-header">
-                  <span class="gc-name">GC-01</span>
-                  <span style="font-size:0.58rem;color:#22c55e">Active</span>
+                <!-- hot air intake top (like CRAH units) -->
+                <div class="gc-intake">
+                  <div class="gc-intake-vent"></div><div class="gc-intake-vent"></div>
+                  <div class="gc-intake-vent"></div><div class="gc-intake-vent"></div>
+                  <div class="gc-intake-vent"></div><div class="gc-intake-vent"></div>
                 </div>
-                <div class="gc-wave"></div>
+                <div class="gc-body">
+                  <div class="gc-header">
+                    <span class="gc-name">GC-01</span>
+                    <span class="gc-status-txt">Active</span>
+                  </div>
+                  <!-- 2 teal fan units -->
+                  <div class="gc-fans">
+                    <div class="gc-fan-unit">
+                      <svg width="46" height="46" viewBox="0 0 46 46">
+                        <circle cx="23" cy="23" r="21" fill="#020c0c" stroke="#0d9488" stroke-width="1.5"/>
+                        <circle cx="23" cy="23" r="17" fill="#010808" stroke="#0f766e" stroke-width="0.8"/>
+                        <g class="teal-fan-g">
+                          <path d="M23 23 Q26 15 23 9 Q20 15 23 23Z" fill="#0d9488" opacity=".9"/>
+                          <path d="M23 23 Q31 20 37 23 Q31 26 23 23Z" fill="#0d9488" opacity=".9"/>
+                          <path d="M23 23 Q20 31 23 37 Q26 31 23 23Z" fill="#0d9488" opacity=".9"/>
+                          <path d="M23 23 Q15 26 9 23 Q15 20 23 23Z" fill="#0d9488" opacity=".9"/>
+                          <path d="M23 23 Q28 15 31 9 Q24 16 23 23Z" fill="#2dd4bf" opacity=".45"/>
+                          <path d="M23 23 Q31 28 35 33 Q27 26 23 23Z" fill="#2dd4bf" opacity=".45"/>
+                          <path d="M23 23 Q18 31 15 37 Q20 29 23 23Z" fill="#2dd4bf" opacity=".45"/>
+                          <path d="M23 23 Q15 18 13 13 Q18 20 23 23Z" fill="#2dd4bf" opacity=".45"/>
+                        </g>
+                        <circle cx="23" cy="23" r="3.5" fill="#010808" stroke="#0d9488" stroke-width="0.8"/>
+                        <circle cx="23" cy="23" r="1.5" fill="#0d9488"/>
+                      </svg>
+                      <span class="gc-fan-lbl">FAN-A</span>
+                    </div>
+                    <div class="gc-fan-unit">
+                      <svg width="46" height="46" viewBox="0 0 46 46">
+                        <circle cx="23" cy="23" r="21" fill="#020c0c" stroke="#0d9488" stroke-width="1.5"/>
+                        <circle cx="23" cy="23" r="17" fill="#010808" stroke="#0f766e" stroke-width="0.8"/>
+                        <g class="teal-fan-g" style="animation-delay:0.35s">
+                          <path d="M23 23 Q26 15 23 9 Q20 15 23 23Z" fill="#0d9488" opacity=".9"/>
+                          <path d="M23 23 Q31 20 37 23 Q31 26 23 23Z" fill="#0d9488" opacity=".9"/>
+                          <path d="M23 23 Q20 31 23 37 Q26 31 23 23Z" fill="#0d9488" opacity=".9"/>
+                          <path d="M23 23 Q15 26 9 23 Q15 20 23 23Z" fill="#0d9488" opacity=".9"/>
+                          <path d="M23 23 Q28 15 31 9 Q24 16 23 23Z" fill="#2dd4bf" opacity=".45"/>
+                          <path d="M23 23 Q31 28 35 33 Q27 26 23 23Z" fill="#2dd4bf" opacity=".45"/>
+                          <path d="M23 23 Q18 31 15 37 Q20 29 23 23Z" fill="#2dd4bf" opacity=".45"/>
+                          <path d="M23 23 Q15 18 13 13 Q18 20 23 23Z" fill="#2dd4bf" opacity=".45"/>
+                        </g>
+                        <circle cx="23" cy="23" r="3.5" fill="#010808" stroke="#0d9488" stroke-width="0.8"/>
+                        <circle cx="23" cy="23" r="1.5" fill="#0d9488"/>
+                      </svg>
+                      <span class="gc-fan-lbl">FAN-B</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- cold air exhaust bottom -->
+                <div class="gc-exhaust"></div>
               </div>
             </div>
 
-            <!-- Pumps -->
-            <div>
-              <div class="comp-head"><span class="comp-title">Circulation Pumps</span></div>
-              <div class="pumps">
-                <div class="pump">
-                  <div class="pump-visual">
-                    <div class="pump-ring"></div>
-                    <div class="pump-ring"></div>
-                    <div class="pump-ring"></div>
-                    <div class="pump-core">P</div>
-                  </div>
-                  <span class="pump-lbl">P-01</span>
-                </div>
-                <div class="pump">
-                  <div class="pump-visual">
-                    <div class="pump-ring"></div>
-                    <div class="pump-ring"></div>
-                    <div class="pump-ring"></div>
-                    <div class="pump-core">P</div>
-                  </div>
-                  <span class="pump-lbl">P-02</span>
-                </div>
+            <!-- TES pipes with pumps on top -->
+            <div class="pipe-canvas">
+              <div class="pump-on-pipe pump-cold">
+                <div class="pump-visual"><div class="pump-ring"></div><div class="pump-ring"></div><div class="pump-ring"></div><div class="pump-core">P</div></div>
+                <span class="pump-lbl">P-01</span>
               </div>
-            </div>
-
-            <!-- TES pipes -->
-            <div class="pipes">
-              <div class="pipe cold"><div class="pipe-flow"></div><span class="pipe-tag">Glycol Supply</span></div>
-              <div class="pipe warm"><div class="pipe-flow"></div><span class="pipe-tag">Glycol Return</span></div>
+              <div class="pump-on-pipe pump-warm">
+                <div class="pump-visual"><div class="pump-ring"></div><div class="pump-ring"></div><div class="pump-ring"></div><div class="pump-core">P</div></div>
+                <span class="pump-lbl">P-02</span>
+              </div>
+              <div class="pipes">
+                <div class="pipe cold"><div class="pipe-flow"></div><span class="pipe-tag">Glycol Supply</span></div>
+                <div class="pipe warm"><div class="pipe-flow"></div><span class="pipe-tag">Glycol Return</span></div>
+              </div>
             </div>
 
           </div>
@@ -456,6 +852,8 @@
       document.querySelectorAll('.mode-view').forEach(v => v.classList.remove('show'));
       e.target.classList.add('active');
       document.getElementById('view-' + mode).classList.add('show');
+      document.getElementById('rack-tops-crah').style.display = mode === 'crah' ? 'flex' : 'none';
+      document.getElementById('rack-tops-dlc').style.display  = mode === 'dlc'  ? 'flex' : 'none';
     }
 
     (function() {
